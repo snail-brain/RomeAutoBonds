@@ -1,3 +1,8 @@
 dotenv: .env
 wallets:
   from_key: ${PRIVATE_KEY}
+
+networks:
+  default: 'moonriver-fork'
+  moonriver-main:
+    verify: True

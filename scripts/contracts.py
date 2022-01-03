@@ -1,6 +1,7 @@
 from brownie import Contract
 import json
 
+
 with open("ROMEFRAXBondDepository.json") as json_file:
     a = json.load(json_file)
 romeFraxBonds = Contract.from_abi(
@@ -35,9 +36,21 @@ staking = Contract.from_abi(
     "ROMEStaking", "0x6f7D019502e17F1ef24AC67a260c65Dd23b759f1", f
 )
 
+with open("stakingHelper.json") as json_file:
+    staking_helper = Contract.from_abi(
+        "StakingHelper",
+        "0x37f9A9436F5dB1ac9e346eAAB482f138DA0D8749",
+        json.load(json_file),
+    )
+
 with open("Rome.json") as json_file:
     g = json.load(json_file)
 rome = Contract.from_abi("Rome", "0x4a436073552044D5f2f49B176853ad3Ad473d9d6", g)
+
+with open("sRome.json") as json_file:
+    sRome = Contract.from_abi(
+        "sRome", "0x89F52002E544585b42F8c7Cf557609CA4c8ce12A", json.load(json_file)
+    )
 
 with open("ROMEFRAX.json") as json_file:
     h = json.load(json_file)
@@ -64,5 +77,12 @@ with open("SolarRouter.json") as json_file:
     solarRouter = Contract.from_abi(
         "SolarRouter",
         "0xAA30eF758139ae4a7f798112902Bf6d65612045f",
+        json.load(json_file),
+    )
+
+with open("SolarLibrary.json") as json_file:
+    solar_library = Contract.from_abi(
+        "SolarLib",
+        "0xe20308fdc8A6ca1cDdc6a17c3B9219618D242C5E",
         json.load(json_file),
     )
