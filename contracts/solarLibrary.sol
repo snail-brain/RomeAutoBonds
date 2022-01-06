@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity =0.6.12;
 
-import "../interfacesISolarPair.sol";
+import "../interfaces/ISolarPair.sol";
 import "./SafeMath.sol";
 
 library SolarLibrary {
