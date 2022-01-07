@@ -15,8 +15,10 @@ account = accounts.add(config["wallets"]["from_key"])
 
 
 def main():
-    swap_rome_to_frax(rome.balanceOf(account.address))
-    bond_frax()
+    # swap_rome_to_frax(rome.balanceOf(account.address))
+    # bond_frax()
+    print(check_discounts())
+
 
 # Staking
 
@@ -134,7 +136,8 @@ def bond_frax():
         account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
     tx.wait(1)
 
-    print("Frax Balance: ", frax.balanceOf(account.address))
+    print("Frax Balance: ", frax.balanceOf(account.address),
+          "Percent Vested: ", bonds[1].percentVestedFor(account.address))
 
 
 # Mim
@@ -148,7 +151,7 @@ def bond_mim():
 
 
 # Wmovr
-def bond_frax():
+def bond_wmovr():
     bond_price = bonds[3].bondPrice()
     tx = bonds[3].deposit(wmovr.balanceOf(
         account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
@@ -165,3 +168,70 @@ def bond_rome_frax():
     tx.wait(1)
 
     print("Rome/Frax Balance: ", romeFrax.balanceOf(account.address))
+
+
+# Check Bond Discounts
+def check_discounts():
+    discounts = []
+    # Rome Price
+    rome_price = solarRouter.getAmountsOut(
+        1 * 10 ** rome.decimals(), [rome.address, frax.address], 25)[1]
+
+    # Find discounts for each bond
+    # Only consider bonds that are still for sale
+    frax_discount = [
+        (rome_price - bonds[1].bondPriceInUSD()) / rome_price, "frax"]
+    if bonds[1].maxPayout() > 0:
+        discounts.append(frax_discount)
+
+    wmovr_discount = [
+        (rome_price - bonds[3].bondPriceInUSD()) / rome_price, "wmovr"]
+    if bonds[3].maxPayout() > 0:
+        discounts.append(wmovr_discount)
+
+    rome_frax_discount = [
+        (rome_price - bonds[0].bondPriceInUSD()) / rome_price, "rome/frax"]
+    if bonds[0].maxPayout() > 0:
+        discounts.append(rome_frax_discount)
+
+    mim_discount = [
+        (rome_price - bonds[2].bondPriceInUSD()) / rome_price, "mim"]
+    if bonds[2].maxPayout() > 0:
+        discounts.append(mim_discount)
+
+    # Find and return the best discount
+    best_discount = 0
+    for dis in discounts:
+        if best_discount == 0:
+            best_discount = dis
+        elif best_discount[0] < dis[0]:
+            best_discount = dis
+
+    return best_discount
+
+
+# Check If Bonding is worth
+
+# Total Rome at End of Bonding Cycle if left staked
+def rome_staked(_amount, _rate):
+    total = _amount
+    count = 15
+
+    while count > -1:
+        total += total * _rate
+        count -= 1
+    return total
+
+# Total Rome at End of Bonding Cycle if bonded
+
+
+def rome_bond_stake(_amount, _rate):
+    total = 0
+    count = 15
+    add = _amount / 16
+
+    while count > -1:
+        total += add
+        total += total * _rate
+        count -= 1
+    return total
