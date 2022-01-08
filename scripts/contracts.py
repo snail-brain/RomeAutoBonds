@@ -91,3 +91,7 @@ with open(".\SolarRouter.json") as json_file:
         "0xe20308fdc8A6ca1cDdc6a17c3B9219618D242C5E",
         json.load(json_file),
     )'''
+
+
+def main():
+    pass

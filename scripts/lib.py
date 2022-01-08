@@ -1,23 +1,15 @@
-from brownie import config, Contract, interface, accounts, chain, SolarLibrary
-from scripts.contracts import (
-    bonds,
-    staking,
-    staking_helper,
-    rome,
-    sRome,
-    frax,
-    mim,
-    wmovr,
-    solarRouter,
-    romeFrax,
-)
+from brownie import config, accounts, chain
+from scripts.contracts import *
 account = accounts.add(config["wallets"]["from_key"])
 
 
 def main():
     # swap_rome_to_frax(rome.balanceOf(account.address))
     # bond_frax()
-    print(check_discounts())
+    un_stake(sRome.balanceOf(account.address))
+    make_swap(rome.balanceOf(account.address), [
+              rome.address, frax.address], frax)
+    bond(frax, bonds[1])
 
 
 # Staking
@@ -47,9 +39,9 @@ def un_stake(_amount):
 # Swaps
 
 
-def swap_rome_to_mim(_amount):
-    path = [rome.address, frax.address, wmovr.address, mim.address]
-    currentQuote = (solarRouter.getAmountsOut(_amount, path, 25)[3])
+def make_swap(_amount, path, token):
+    currentQuote = (solarRouter.getAmountsOut(
+        _amount, path, 25)[len(path) - 1])
     min_amount = currentQuote - currentQuote * .005
 
     tx = solarRouter.swapExactTokensForTokens(
@@ -62,49 +54,12 @@ def swap_rome_to_mim(_amount):
     )
     tx.wait(1)
 
-    print(
-        "Current Quote: ", min_amount / 10 ** 18,
-        "Mim Balance: ",
-        mim.balanceOf(account.address) / 10 ** mim.decimals(),
-        "Rome Balance: ",
-        rome.balanceOf(account.address) / 10 ** rome.decimals(),
-    )
-
-
-def swap_rome_to_frax(_amount):
-    path = [rome.address, frax.address]
-    currentQuote = (solarRouter.getAmountsOut(_amount, path, 25)[1])
-    min_amount = currentQuote - currentQuote * .005
-
-    tx = solarRouter.swapExactTokensForTokens(
-        _amount, min_amount, path, account.address, len(chain) + 10000000000, {"from": account})
-    tx.wait(1)
-
-    print(
-        "Current Quote: ", min_amount / 10 ** 18,
-        "Frax Balance: ",
-        frax.balanceOf(account.address) / 10 ** mim.decimals(),
-        "Rome Balance: ",
-        rome.balanceOf(account.address) / 10 ** rome.decimals(),
-    )
-
-
-def swap_rome_to_movr(_amount):
-    path = [rome.address, frax.address, wmovr.address]
-    currentQuote = (solarRouter.getAmountsOut(_amount, path, 25)[2])
-    min_amount = currentQuote - currentQuote * .005
-
-    tx = solarRouter.swapExactTokensForTokens(
-        _amount, min_amount, path, account.address, len(chain) + 10000000000, {"from": account})
-    tx.wait(1)
-
-    print(
-        "Current Quote: ", min_amount / 10 ** 18,
-        "wMOVR Balance: ",
-        wmovr.balanceOf(account.address) / 10 ** wmovr.decimals(),
-        "Rome Balance: ",
-        rome.balanceOf(account.address) / 10 ** rome.decimals(),
-    )
+    print("Current Quote: ", min_amount / 10 ** 18,
+          "Token Balance: ",
+          token.balanceOf(account.address) / 10 ** token.decimals(),
+          "Rome Balance: ",
+          rome.balanceOf(account.address) / 10 ** rome.decimals(),
+          )
 
 
 def add_rome_frax_liq(_amount):
@@ -129,48 +84,18 @@ def add_rome_frax_liq(_amount):
 # Assume I've already made the swap to the token to be bonded
 
 
-# Frax
-def bond_frax():
-    bond_price = bonds[1].bondPrice()
-    tx = bonds[1].deposit(frax.balanceOf(
+def bond(token, bond):
+    bond_price = bond.bondPrice()
+    tx = bond.deposit(token.balanceOf(
         account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
     tx.wait(1)
 
-    print("Frax Balance: ", frax.balanceOf(account.address),
-          "Percent Vested: ", bonds[1].percentVestedFor(account.address))
-
-
-# Mim
-def bond_mim():
-    bond_price = bonds[2].bondPrice()
-    tx = bonds[2].deposit(mim.balanceOf(
-        account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
-    tx.wait(1)
-
-    print("Mim Balance: ", mim.balanceOf(account.address))
-
-
-# Wmovr
-def bond_wmovr():
-    bond_price = bonds[3].bondPrice()
-    tx = bonds[3].deposit(wmovr.balanceOf(
-        account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
-    tx.wait(1)
-
-    print("MOVR Balance: ", wmovr.balanceOf(account.address))
-
-
-# Rome/Frax
-def bond_rome_frax():
-    bond_price = bonds[0].bondPrice()
-    tx = bonds[0].deposit(romeFrax.balanceOf(
-        account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
-    tx.wait(1)
-
-    print("Rome/Frax Balance: ", romeFrax.balanceOf(account.address))
-
+    print("Token Balance: ", frax.balanceOf(account.address),
+          "Percent Vested: ", bond.percentVestedFor(account.address))
 
 # Check Bond Discounts
+
+
 def check_discounts():
     discounts = []
     # Rome Price
@@ -235,3 +160,22 @@ def rome_bond_stake(_amount, _rate):
         total += total * _rate
         count -= 1
     return total
+
+
+def redeem_bonds():
+    (payout_frax, vesting_frax, a, b) = bonds[1].bondInfo(account.address)
+    if payout_frax > 0:
+        bonds[1].redeem(account.address, True)
+
+    (payout_mim, vesting_mim, c, d) = bonds[2].bondInfo(account.address)
+    if payout_mim > 0:
+        bonds[2].redeem(account.address, True)
+
+    (payout_wmovr, vesting_wmovr, c, d) = bonds[3].bondInfo(account.address)
+    if payout_wmovr > 0:
+        bonds[3].redeem(account.address, True)
+
+    (payout_rome_frax, vesting_rome_frax, c,
+     d) = bonds[0].bondInfo(account.address)
+    if payout_rome_frax > 0:
+        bonds[0].redeem(account.address, True)
