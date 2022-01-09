@@ -26,3 +26,4 @@ def main():
         redeem_bonds()
         stake(rome.balanceOf(account.address))
         # 3. Adjust json values
+    print(distributor.nextRewardFor(account.address))

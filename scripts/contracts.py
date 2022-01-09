@@ -85,6 +85,11 @@ with open(".\SolarRouter.json") as json_file:
         json.load(json_file),
     )
 
+with open(".\distributor.json") as json_file:
+    distributor = Contract.from_abi(
+        "Distributor", "0x5BCF9C0A5fe546990248c5A3AD794409F471f28e", json.load(json_file))
+
+
 '''with open(".\SolarLibrary.json") as json_file:
     solar_library = Contract.from_abi(
         "SolarLib",
