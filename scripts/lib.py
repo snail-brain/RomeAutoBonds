@@ -7,9 +7,8 @@ def main():
     # swap_rome_to_frax(rome.balanceOf(account.address))
     # bond_frax()
     un_stake(sRome.balanceOf(account.address))
-    make_swap(rome.balanceOf(account.address), [
-              rome.address, frax.address], frax)
-    bond(frax, bonds[1])
+    add_rome_frax_liq(rome.balanceOf(account.address))
+    bond(romeFrax, romeFraxBonds)
 
 
 # Staking
@@ -105,23 +104,23 @@ def check_discounts():
     # Find discounts for each bond
     # Only consider bonds that are still for sale
     frax_discount = [
-        (rome_price - bonds[1].bondPriceInUSD()) / rome_price, "frax"]
-    if bonds[1].maxPayout() > 0:
+        (rome_price - fraxBonds.bondPriceInUSD()) / rome_price, frax, fraxBonds, [rome.address, frax.address]]
+    if fraxBonds.maxPayout() > 0:
         discounts.append(frax_discount)
 
     wmovr_discount = [
-        (rome_price - bonds[3].bondPriceInUSD()) / rome_price, "wmovr"]
-    if bonds[3].maxPayout() > 0:
+        (rome_price - movrBonds.bondPriceInUSD()) / rome_price, wmovr, movrBonds, [rome.address, frax.address, wmovr.address]]
+    if movrBonds.maxPayout() > 0:
         discounts.append(wmovr_discount)
 
     rome_frax_discount = [
-        (rome_price - bonds[0].bondPriceInUSD()) / rome_price, "rome/frax"]
-    if bonds[0].maxPayout() > 0:
+        (rome_price - romeFraxBonds.bondPriceInUSD()) / rome_price, romeFrax, romeFraxBonds]
+    if romeFraxBonds.maxPayout() > 0:
         discounts.append(rome_frax_discount)
 
     mim_discount = [
-        (rome_price - bonds[2].bondPriceInUSD()) / rome_price, "mim"]
-    if bonds[2].maxPayout() > 0:
+        (rome_price - mimBonds.bondPriceInUSD()) / rome_price, mim, mimBonds, [rome.address, frax.address, wmovr.address, mim.address]]
+    if mimBonds.maxPayout() > 0:
         discounts.append(mim_discount)
 
     # Find and return the best discount
@@ -163,19 +162,19 @@ def rome_bond_stake(_amount, _rate):
 
 
 def redeem_bonds():
-    (payout_frax, vesting_frax, a, b) = bonds[1].bondInfo(account.address)
+    (payout_frax, vesting_frax, a, b) = fraxBonds.bondInfo(account.address)
     if payout_frax > 0:
-        bonds[1].redeem(account.address, True)
+        fraxBonds.redeem(account.address, True)
 
-    (payout_mim, vesting_mim, c, d) = bonds[2].bondInfo(account.address)
+    (payout_mim, vesting_mim, c, d) = mimBonds.bondInfo(account.address)
     if payout_mim > 0:
-        bonds[2].redeem(account.address, True)
+        mimBonds.redeem(account.address, True)
 
-    (payout_wmovr, vesting_wmovr, c, d) = bonds[3].bondInfo(account.address)
+    (payout_wmovr, vesting_wmovr, e, f) = movrBonds.bondInfo(account.address)
     if payout_wmovr > 0:
-        bonds[3].redeem(account.address, True)
+        movrBonds.redeem(account.address, True)
 
-    (payout_rome_frax, vesting_rome_frax, c,
-     d) = bonds[0].bondInfo(account.address)
+    (payout_rome_frax, vesting_rome_frax, g,
+     h) = romeFraxBonds.bondInfo(account.address)
     if payout_rome_frax > 0:
-        bonds[0].redeem(account.address, True)
+        romeFraxBonds.redeem(account.address, True)

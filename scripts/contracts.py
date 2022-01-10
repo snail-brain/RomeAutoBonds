@@ -28,8 +28,6 @@ movrBonds = Contract.from_abi(
     "MOVRBondDepository", "0x54C6Afb58Aa21d11aEaFE6B199F9663e908345e4", d
 )
 
-bonds = [romeFraxBonds, fraxBonds, mimBonds, movrBonds]
-
 with open(".\ROMEStaking.json") as json_file:
     f = json.load(json_file)
 staking = Contract.from_abi(
@@ -88,14 +86,6 @@ with open(".\SolarRouter.json") as json_file:
 with open(".\distributor.json") as json_file:
     distributor = Contract.from_abi(
         "Distributor", "0x5BCF9C0A5fe546990248c5A3AD794409F471f28e", json.load(json_file))
-
-
-'''with open(".\SolarLibrary.json") as json_file:
-    solar_library = Contract.from_abi(
-        "SolarLib",
-        "0xe20308fdc8A6ca1cDdc6a17c3B9219618D242C5E",
-        json.load(json_file),
-    )'''
 
 
 def main():
