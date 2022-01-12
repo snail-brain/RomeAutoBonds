@@ -1,9 +1,0 @@
-rome.approve(staking.address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-sRome.approve(staking.address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-romeFrax.approve(bonds[0].address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-frax.approve(bonds[1].address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-mim.approve(bonds[2].address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-wmovr.approve(bonds[3].address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-rome.approve(solarRouter.address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-frax.approve(solarRouter.address, 1 * 10 ** 50, {"from": account, "gas": 50000})
-solarLibrary = 0x07304A4C7a5869be199084561C600a9D4909d231
