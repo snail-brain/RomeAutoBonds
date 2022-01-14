@@ -1,12 +1,13 @@
 from brownie import config, accounts, chain
 from scripts.contracts import *
+
 account = accounts.add(config["wallets"]["from_key"])
 
 
 def main():
     # swap_rome_to_frax(rome.balanceOf(account.address))
     # bond_frax()
-    un_stake(sRome.balanceOf(account.address))
+    un_stake()
     add_rome_frax_liq(rome.balanceOf(account.address))
     bond(romeFrax, romeFraxBonds)
 
@@ -25,8 +26,8 @@ def stake(_amount):
     )
 
 
-def un_stake(_amount):
-    tx = staking.unstake(_amount, True, {"from": account})
+def un_stake():
+    tx = staking.unstake(sRome.balanceOf(account.address), True, {"from": account})
     tx.wait(1)
     print(
         "Rome Balance: ",
@@ -35,13 +36,13 @@ def un_stake(_amount):
         sRome.balanceOf(account.address),
     )
 
+
 # Swaps
 
 
 def make_swap(_amount, path, token):
-    currentQuote = (solarRouter.getAmountsOut(
-        _amount, path, 25)[len(path) - 1])
-    min_amount = currentQuote - currentQuote * .005
+    currentQuote = solarRouter.getAmountsOut(_amount, path, 25)[len(path) - 1]
+    min_amount = currentQuote - currentQuote * 0.005
 
     tx = solarRouter.swapExactTokensForTokens(
         _amount,
@@ -53,31 +54,53 @@ def make_swap(_amount, path, token):
     )
     tx.wait(1)
 
-    print("Current Quote: ", min_amount / 10 ** 18,
-          "Token Balance: ",
-          token.balanceOf(account.address) / 10 ** token.decimals(),
-          "Rome Balance: ",
-          rome.balanceOf(account.address) / 10 ** rome.decimals(),
-          )
+    print(
+        "Current Quote: ",
+        min_amount / 10 ** 18,
+        "Token Balance: ",
+        token.balanceOf(account.address) / 10 ** token.decimals(),
+        "Rome Balance: ",
+        rome.balanceOf(account.address) / 10 ** rome.decimals(),
+    )
 
 
 def add_rome_frax_liq(_amount):
     path = [rome.address, frax.address]
-    currentQuote = (solarRouter.getAmountsOut(_amount / 2, path, 25)[1])
-    min_amount = currentQuote - currentQuote * .005
+    currentQuote = solarRouter.getAmountsOut(_amount / 2, path, 25)[1]
+    min_amount = currentQuote - currentQuote * 0.005
 
     tx_swap = solarRouter.swapExactTokensForTokens(
-        _amount / 2, min_amount, path, account.address, len(chain) + 10000000000, {"from": account})
+        _amount / 2,
+        min_amount,
+        path,
+        account.address,
+        len(chain) + 10000000000,
+        {"from": account},
+    )
     tx_swap.wait(1)
 
-    print("Rome Balance: ", rome.balanceOf(account.address) / 10 ** rome.decimals(),
-          "Frax Balance: ", frax.balanceOf(account.address) / 10 ** frax.decimals())
+    print(
+        "Rome Balance: ",
+        rome.balanceOf(account.address) / 10 ** rome.decimals(),
+        "Frax Balance: ",
+        frax.balanceOf(account.address) / 10 ** frax.decimals(),
+    )
 
-    tx_add = solarRouter.addLiquidity(rome.address, frax.address, rome.balanceOf(account.address), frax.balanceOf(
-        account.address), rome.balanceOf(account.address) * .005, frax.balanceOf(account.address) * .005, account.address, len(chain) + 10000000000, {"from": account})
+    tx_add = solarRouter.addLiquidity(
+        rome.address,
+        frax.address,
+        rome.balanceOf(account.address),
+        frax.balanceOf(account.address),
+        rome.balanceOf(account.address) * 0.005,
+        frax.balanceOf(account.address) * 0.005,
+        account.address,
+        len(chain) + 10000000000,
+        {"from": account},
+    )
     tx_add.wait(1)
 
     print("Rome/Frax LP: ", romeFrax.balanceOf(account.address) / 10 ** 18)
+
 
 # Bonds
 # Assume I've already made the swap to the token to be bonded
@@ -85,12 +108,21 @@ def add_rome_frax_liq(_amount):
 
 def bond(token, bond):
     bond_price = bond.bondPrice()
-    tx = bond.deposit(token.balanceOf(
-        account.address), (bond_price + (bond_price * .005)), account.address, {"from": account})
+    tx = bond.deposit(
+        token.balanceOf(account.address),
+        (bond_price + (bond_price * 0.005)),
+        account.address,
+        {"from": account},
+    )
     tx.wait(1)
 
-    print("Token Balance: ", frax.balanceOf(account.address),
-          "Percent Vested: ", bond.percentVestedFor(account.address))
+    print(
+        "Token Balance: ",
+        frax.balanceOf(account.address),
+        "Percent Vested: ",
+        bond.percentVestedFor(account.address),
+    )
+
 
 # Check Bond Discounts
 
@@ -99,27 +131,43 @@ def check_discounts():
     discounts = []
     # Rome Price
     rome_price = solarRouter.getAmountsOut(
-        1 * 10 ** rome.decimals(), [rome.address, frax.address], 25)[1]
+        1 * 10 ** rome.decimals(), [rome.address, frax.address], 25
+    )[1]
 
     # Find discounts for each bond
     # Only consider bonds that are still for sale
     frax_discount = [
-        (rome_price - fraxBonds.bondPriceInUSD()) / rome_price, frax, fraxBonds, [rome.address, frax.address]]
+        (rome_price - fraxBonds.bondPriceInUSD()) / rome_price,
+        frax,
+        fraxBonds,
+        [rome.address, frax.address],
+    ]
     if fraxBonds.maxPayout() > 0:
         discounts.append(frax_discount)
 
     wmovr_discount = [
-        (rome_price - movrBonds.bondPriceInUSD()) / rome_price, wmovr, movrBonds, [rome.address, frax.address, wmovr.address]]
+        (rome_price - movrBonds.bondPriceInUSD()) / rome_price,
+        wmovr,
+        movrBonds,
+        [rome.address, frax.address, wmovr.address],
+    ]
     if movrBonds.maxPayout() > 0:
         discounts.append(wmovr_discount)
 
     rome_frax_discount = [
-        (rome_price - romeFraxBonds.bondPriceInUSD()) / rome_price, romeFrax, romeFraxBonds]
+        (rome_price - romeFraxBonds.bondPriceInUSD()) / rome_price,
+        romeFrax,
+        romeFraxBonds,
+    ]
     if romeFraxBonds.maxPayout() > 0:
         discounts.append(rome_frax_discount)
 
     mim_discount = [
-        (rome_price - mimBonds.bondPriceInUSD()) / rome_price, mim, mimBonds, [rome.address, frax.address, wmovr.address, mim.address]]
+        (rome_price - mimBonds.bondPriceInUSD()) / rome_price,
+        mim,
+        mimBonds,
+        [rome.address, frax.address, wmovr.address, mim.address],
+    ]
     if mimBonds.maxPayout() > 0:
         discounts.append(mim_discount)
 
@@ -145,6 +193,7 @@ def rome_staked(_amount, _rate):
         total += total * _rate
         count -= 1
     return total
+
 
 # Total Rome at End of Bonding Cycle if bonded
 
@@ -174,7 +223,8 @@ def redeem_bonds():
     if payout_wmovr > 0:
         movrBonds.redeem(account.address, True)
 
-    (payout_rome_frax, vesting_rome_frax, g,
-     h) = romeFraxBonds.bondInfo(account.address)
+    (payout_rome_frax, vesting_rome_frax, g, h) = romeFraxBonds.bondInfo(
+        account.address
+    )
     if payout_rome_frax > 0:
         romeFraxBonds.redeem(account.address, True)

@@ -28,6 +28,13 @@ movrBonds = Contract.from_abi(
     "MOVRBondDepository", "0x54C6Afb58Aa21d11aEaFE6B199F9663e908345e4", d
 )
 
+with open("./ABIs/gOHMBondDepository.json") as json_file:
+    gOHMBonds = Contract.from_abi(
+        "gOHMBondDepository",
+        "0xC82d354Cc96b5Cd0ee5B63569b5b51a2D3c5a895",
+        json.load(json_file),
+    )
+
 with open("./ABIs/ROMEStaking.json") as json_file:
     f = json.load(json_file)
 staking = Contract.from_abi(
@@ -69,6 +76,11 @@ with open("./ABIs/MIM.json") as json_file:
 with open("./ABIs/WMOVR.json") as json_file:
     wmovr = Contract.from_abi(
         "WMOVR", "0x98878B06940aE243284CA214f92Bb71a2b032B8A", json.load(json_file)
+    )
+
+with open("./ABIs/gOHM.json") as json_file:
+    gohm = Contract.from_abi(
+        "gOHM", "0x3bF21Ce864e58731B6f28D68d5928BcBEb0Ad172", json.load(json_file)
     )
 
 with open("./ABIs/SolarRouter.json") as json_file:
