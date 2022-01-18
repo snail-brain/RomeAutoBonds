@@ -171,6 +171,12 @@ def check_discounts():
     if mimBonds.maxPayout() > 0:
         discounts.append(mim_discount)
 
+    """ gohm_discount = [
+        (rome_price - gOHMBonds.bondPrice()) / rome_price,
+        gohm,
+        gOHMBonds,
+    ]
+"""
     # Find and return the best discount
     best_discount = 0
     for dis in discounts:

@@ -1,6 +1,6 @@
 from scripts.lib import *
 from scripts.contracts import *
-import json
+
 
 # Save next rebase block in text file? Or json?
 
@@ -26,8 +26,8 @@ def real_deal():
     print("No bond: ", ending_rome_no_bond, "Yes bond: ", ending_rome_yes_bond)
 
     profit = 1 - (ending_rome_no_bond / ending_rome_yes_bond)
-    if profit > 0.005:
-        un_stake({"from": account})
+    if profit > 0.01:
+        un_stake()
         if best_deal[1] == romeFrax:
             add_rome_frax_liq(rome.balance(), {"from": account})
         else:
@@ -51,5 +51,6 @@ def if_end_is_near():
 
 
 def main():
-    if_end_is_near()
-    real_deal()
+    # if_end_is_near()
+    # real_deal()
+    un_stake()

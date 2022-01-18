@@ -3,6 +3,6 @@ wallets:
   from_key: ${PRIVATE_KEY}
 
 networks:
-  default: 'moonriver-fork'
+  default: 'moonriver-main'
   moonriver-main:
     verify: True
