@@ -5,36 +5,44 @@ account = accounts.add(config["wallets"]["from_key"])
 
 
 def main():
-    # swap_rome_to_frax(rome.balanceOf(account.address))
-    # bond_frax()
-    un_stake()
-    add_rome_frax_liq(rome.balanceOf(account.address))
-    bond(romeFrax, romeFraxBonds)
+    pass
 
 
 # Staking
 
 
-def stake(_amount):
-    tx = staking_helper.stake(_amount, account.address, {"from": account})
-    tx.wait(1)
-    print(
-        "Rome Balance: ",
-        rome.balanceOf(account.address) / 10 ** rome.decimals(),
-        "sRome Balance: ",
-        sRome.balanceOf(account.address) / 10 ** sRome.decimals(),
-    )
+def stake():
+    if rome.balanceOf(account.address) > 0:
+        tx = staking_helper.stake(
+            rome.balanceOf(account.address),
+            account.address,
+            {"from": account, "gas": 10000000},
+        )
+        tx.wait(1)
+        print(
+            "Rome Balance: ",
+            rome.balanceOf(account.address) / 10 ** rome.decimals(),
+            "sRome Balance: ",
+            sRome.balanceOf(account.address) / 10 ** sRome.decimals(),
+        )
+    else:
+        print("No Rome to stake!")
 
 
 def un_stake():
-    tx = staking.unstake(sRome.balanceOf(account.address), True, {"from": account})
-    tx.wait(1)
-    print(
-        "Rome Balance: ",
-        rome.balanceOf(account.address),
-        "sRome Balance: ",
-        sRome.balanceOf(account.address),
-    )
+    if sRome.balanceOf(account.address) > 0:
+        tx = staking.unstake(
+            sRome.balanceOf(account.address), True, {"from": account, "gas": 10000000}
+        )
+        tx.wait(1)
+        print(
+            "Rome Balance: ",
+            rome.balanceOf(account.address) / 10 ** rome.decimals(),
+            "sRome Balance: ",
+            sRome.balanceOf(account.address) / 10 ** sRome.decimals(),
+        )
+    else:
+        print("No Rome currently staked!")
 
 
 # Swaps
@@ -50,7 +58,7 @@ def make_swap(_amount, path, token):
         path,
         account.address,
         len(chain) + 10000000000,
-        {"from": account},
+        {"from": account, "gas": 10000000},
     )
     tx.wait(1)
 
@@ -75,7 +83,7 @@ def add_rome_frax_liq(_amount):
         path,
         account.address,
         len(chain) + 10000000000,
-        {"from": account},
+        {"from": account, "gas": 10000000},
     )
     tx_swap.wait(1)
 
@@ -95,7 +103,7 @@ def add_rome_frax_liq(_amount):
         frax.balanceOf(account.address) * 0.005,
         account.address,
         len(chain) + 10000000000,
-        {"from": account},
+        {"from": account, "gas": 10000000},
     )
     tx_add.wait(1)
 
@@ -112,7 +120,7 @@ def bond(token, bond):
         token.balanceOf(account.address),
         (bond_price + (bond_price * 0.005)),
         account.address,
-        {"from": account},
+        {"from": account, "gas": 10000000},
     )
     tx.wait(1)
 
