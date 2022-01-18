@@ -1,3 +1,4 @@
+from click import unstyle
 from scripts.lib import *
 from scripts.contracts import *
 
@@ -54,4 +55,4 @@ def if_end_is_near():
 def main():
     # if_end_is_near()
     # real_deal()
-    stake()
+    un_stake()
