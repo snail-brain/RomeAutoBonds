@@ -27,9 +27,9 @@ def real_deal():
 
     profit = 1 - (ending_rome_no_bond / ending_rome_yes_bond)
     if profit > 0.005:
-        un_stake({"from": account})
+        un_stake()
         if best_deal[1] == romeFrax:
-            add_rome_frax_liq(rome.balance(), {"from": account})
+            add_rome_frax_liq(rome.balance())
         else:
             make_swap(
                 rome.balanceOf(account.address),
@@ -37,13 +37,13 @@ def real_deal():
                 best_deal[1],
                 {"from": account},
             )
-            bond(best_deal[1], best_deal[2], {"from": account})
+            bond(best_deal[1], best_deal[2])
 
 
 def if_end_is_near():
     if next_action_block < len(chain) - 1:
         redeem_bonds()
-        stake(rome.balanceOf(account.address))
+        stake()
         new_block = next_action_block + epoch_length
 
         with open("block_tracker.txt", "w") as txt:
