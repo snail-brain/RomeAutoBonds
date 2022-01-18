@@ -15,9 +15,11 @@ def main():
 # Staking
 
 
-def stake(_amount):
+def stake():
     if rome.balanceOf(account.address) > 0:
-        tx = staking_helper.stake(_amount, account.address, {"from": account})
+        tx = staking_helper.stake(
+            rome.balanceOf(account.address), account.address, {"from": account}
+        )
         tx.wait(1)
         print(
             "Rome Balance: ",
