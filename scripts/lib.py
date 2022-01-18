@@ -16,25 +16,31 @@ def main():
 
 
 def stake(_amount):
-    tx = staking_helper.stake(_amount, account.address, {"from": account})
-    tx.wait(1)
-    print(
-        "Rome Balance: ",
-        rome.balanceOf(account.address) / 10 ** rome.decimals(),
-        "sRome Balance: ",
-        sRome.balanceOf(account.address) / 10 ** sRome.decimals(),
-    )
+    if rome.balanceOf(account.address) > 0:
+        tx = staking_helper.stake(_amount, account.address, {"from": account})
+        tx.wait(1)
+        print(
+            "Rome Balance: ",
+            rome.balanceOf(account.address) / 10 ** rome.decimals(),
+            "sRome Balance: ",
+            sRome.balanceOf(account.address) / 10 ** sRome.decimals(),
+        )
+    else:
+        print("No Rome to stake!")
 
 
 def un_stake():
-    tx = staking.unstake(sRome.balanceOf(account.address), True, {"from": account})
-    tx.wait(1)
-    print(
-        "Rome Balance: ",
-        rome.balanceOf(account.address),
-        "sRome Balance: ",
-        sRome.balanceOf(account.address),
-    )
+    if sRome.balanceOf(account.address) > 0:
+        tx = staking.unstake(sRome.balanceOf(account.address), True, {"from": account})
+        tx.wait(1)
+        print(
+            "Rome Balance: ",
+            rome.balanceOf(account.address),
+            "sRome Balance: ",
+            sRome.balanceOf(account.address),
+        )
+    else:
+        print("No Rome currently staked!")
 
 
 # Swaps
