@@ -31,12 +31,7 @@ def real_deal():
         if best_deal[1] == romeFrax:
             add_rome_frax_liq(rome.balance())
         else:
-            make_swap(
-                rome.balanceOf(account.address),
-                best_deal[3],
-                best_deal[1],
-                {"from": account},
-            )
+            make_swap(rome.balanceOf(account.address), best_deal[3], best_deal[1])
             bond(best_deal[1], best_deal[2])
 
 
@@ -51,5 +46,6 @@ def if_end_is_near():
 
 
 def main():
-    if_end_is_near()
-    real_deal()
+    # if_end_is_near()
+    # real_deal()
+    print(end_block)
