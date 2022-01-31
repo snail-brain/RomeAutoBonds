@@ -35,8 +35,7 @@ def real_deal():
             make_swap(
                 rome.balanceOf(account.address),
                 best_deal[3],
-                best_deal[1],
-                {"from": account},
+                best_deal[1]
             )
             bond(best_deal[1], best_deal[2])
 
@@ -53,6 +52,6 @@ def if_end_is_near():
 
 
 def main():
-    # if_end_is_near()
-    # real_deal()
-    un_stake()
+    if_end_is_near()
+    real_deal()
+    
