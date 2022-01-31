@@ -1,4 +1,3 @@
-from click import unstyle
 from scripts.lib import *
 from scripts.contracts import *
 
