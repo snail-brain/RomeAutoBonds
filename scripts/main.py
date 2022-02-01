@@ -13,30 +13,31 @@ staking_rate = to_distribute / total_staked
 
 
 def real_deal():
-    best_deal = check_discounts()
-    print("Best deal: ", best_deal)
-    total_rome = rome.balanceOf(account.address) + sRome.balanceOf(account.address)
+    if sRome.balanceOf(account.address) + rome.balanceOf(account.address) > 0:
+        best_deal = check_discounts()
+        print("Best deal: ", best_deal)
+        total_rome = rome.balanceOf(account.address) + sRome.balanceOf(account.address)
 
-    # Compare end-of-bond rome amount to default stake amount
-    ending_rome_no_bond = rome_staked(total_rome, staking_rate)
-    ending_rome_yes_bond = rome_bond_stake(
-        total_rome + (total_rome * best_deal[0]), staking_rate
-    )
+        # Compare end-of-bond rome amount to default stake amount
+        ending_rome_no_bond = rome_staked(total_rome, staking_rate)
+        ending_rome_yes_bond = rome_bond_stake(
+            total_rome + (total_rome * best_deal[0]), staking_rate
+        )
 
-    print("No bond: ", ending_rome_no_bond, "Yes bond: ", ending_rome_yes_bond)
+        print("No bond: ", ending_rome_no_bond, "Yes bond: ", ending_rome_yes_bond)
 
-    profit = 1 - (ending_rome_no_bond / ending_rome_yes_bond)
-    if profit > 0.01:
-        un_stake()
-        if best_deal[1] == romeFrax:
-            add_rome_frax_liq(rome.balance())
-        else:
-            make_swap(
-                rome.balanceOf(account.address),
-                best_deal[3],
-                best_deal[1]
-            )
-            bond(best_deal[1], best_deal[2])
+        profit = 1 - (ending_rome_no_bond / ending_rome_yes_bond)
+        if profit > 0.01:
+            un_stake()
+            if best_deal[1] == romeFrax:
+                add_rome_frax_liq(rome.balance())
+            else:
+                make_swap(
+                    rome.balanceOf(account.address),
+                    best_deal[3],
+                    best_deal[1]
+                )
+                bond(best_deal[1], best_deal[2])
 
 
 def if_end_is_near():
