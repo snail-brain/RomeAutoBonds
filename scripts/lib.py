@@ -227,18 +227,18 @@ def rome_bond_stake(_amount, _rate):
 def redeem_bonds():
     (payout_frax, vesting_frax, a, b) = fraxBonds.bondInfo(account.address)
     if payout_frax > 0:
-        fraxBonds.redeem(account.address, True)
+        fraxBonds.redeem(account.address, True, {"from": account, "gas": 10000000})
 
     (payout_mim, vesting_mim, c, d) = mimBonds.bondInfo(account.address)
     if payout_mim > 0:
-        mimBonds.redeem(account.address, True)
+        mimBonds.redeem(account.address, True, {"from": account, "gas": 10000000})
 
     (payout_wmovr, vesting_wmovr, e, f) = movrBonds.bondInfo(account.address)
     if payout_wmovr > 0:
-        movrBonds.redeem(account.address, True)
+        movrBonds.redeem(account.address, True, {"from": account, "gas": 10000000})
 
     (payout_rome_frax, vesting_rome_frax, g, h) = romeFraxBonds.bondInfo(
         account.address
     )
     if payout_rome_frax > 0:
-        romeFraxBonds.redeem(account.address, True)
+        romeFraxBonds.redeem(account.address, True, {"from": account, "gas": 10000000})
